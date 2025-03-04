@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .pay-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pay-button:hover {
+            background-color: #45a049;
+        }
+        .navbar {
+            text-align: center;
+            padding: 15px;
+            background-color: #444;
+        }
+        
+        .navbar a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+    </style>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/paymentLink">Payment Link</a>
+        <a href="/orderPay">Order Pay</a>
+        <a href="/verify">Verify Status</a>
+    </div>
+
+    <button id ="renderBtn" class="pay-button">Pay</button>
+    <script>
+        const paymentSessionId = ''
+        const cashfree = Cashfree({
+            mode:"sandbox" //or production
+        });
+        fetch('http://127.0.0.1:5000/pay', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                amount: 1000,
+                phone: '9043633120'
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+        const paymentSessionId = data.payment_session_id;  
+        document.getElementById("renderBtn").addEventListener("click", () => {
+            console.log("inside click", data)
+            let checkoutOptions = {
+                paymentSessionId: data.session_id,
+                redirectTarget: "_blank",
+            };
+            cashfree.checkout(checkoutOptions);
+        });
+        })
+        .catch(error => {
+            console.error("Error fetching payment session:", error);
+        }); 
+
+    </script>
+</body>
+</html>
